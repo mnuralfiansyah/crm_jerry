@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\CabangService;
+use App\Services\HutangTokoService;
 use App\Services\IndentService;
 use App\Services\LaporanPelangganPeriodeService;
 use App\Services\LaporanPendapatanService;
 use App\Services\LaporanPenjualanService;
+use App\Services\PiutangPelangganService;
 use App\Services\ReturService;
 use App\Services\SalesService;
 use App\Services\StokService;
@@ -17,6 +19,7 @@ class CrmController extends Controller
 
     public function __construct(
         protected CabangService $cabangService,
+        protected HutangTokoService $hutangTokoService,
         protected SalesService $salesService,
         protected TerimaPiutangService $terimaPiutangService,
         protected ReturService $returService,
@@ -25,6 +28,7 @@ class CrmController extends Controller
         protected LaporanPendapatanService $laporanPendapatanService,
         protected IndentService $indentService,
         protected LaporanPenjualanService $laporanPenjualanService,
+        protected PiutangPelangganService $piutangPelangganService,
     ) {}
 
     public function cabang(): array
@@ -35,6 +39,39 @@ class CrmController extends Controller
     public function sales(): array
     {
         return $this->salesService->sales();
+    }
+
+    public function stok()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->stokService->stok()
+        ]);
+    }
+
+    public function pelanggan_periode()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->laporanPelangganPeriodeService->pelanggan_periode()
+        ]);
+    }
+
+    public function hutang_toko()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->hutangTokoService->hutang_toko(),
+            'pengirim' => $this->hutangTokoService->groupByPengirim(),
+            'toko' => $this->hutangTokoService->groupByToko()
+        ]);
+    }
+
+    public function piutang_pelanggan()
+    {
+        return $this->sendSuccessResponse([
+            'summary' => $this->piutangPelangganService->summary(),
+            'list' => $this->piutangPelangganService->piutang_pelanggan(),
+            'pelanggan' => $this->piutangPelangganService->groupByPelanggan(),
+            'aging' => $this->piutangPelangganService->aging()
+        ]);
     }
 
     public function terima_piutang()

@@ -6,7 +6,9 @@ Base URL:
 http://127.0.0.1:8000/api
 ```
 
-## GET /cabang
+Semua endpoint memakai `GET`, jadi request body tidak ada. Filter dikirim lewat query parameter.
+
+## Cabang
 
 URL:
 
@@ -15,33 +17,26 @@ GET /api/cabang
 GET /api/branches
 ```
 
-Query:
+Query parameters:
 
-```text
-Tidak ada
-```
-
-Filter:
-
-| Field | Filter |
+| Parameter | Wajib |
 | --- | --- |
-| `cabang.deleted_at` | `IS NULL` |
-| `toko.deleted_at` | `IS NULL` |
+| Tidak ada | - |
 
-Response payload:
+Response:
 
 ```json
 [
   {
-    "id_cabang": 1,
-    "id_toko": 2,
+    "id_cabang": "cabang-1",
+    "id_toko": "toko-1",
     "nama_toko": "Toko A",
-    "nama_cabang": "Cabang Utama (Toko A)"
+    "nama_cabang": "Cabang A (Toko A)"
   }
 ]
 ```
 
-## GET /sales
+## Sales
 
 URL:
 
@@ -50,83 +45,40 @@ GET /api/sales
 GET /api/salespeople
 ```
 
-Query:
+Query parameters:
 
 | Parameter | Wajib | Contoh |
 | --- | --- | --- |
-| `id_cabang` | Tidak | `1` |
-| `id_toko` | Tidak | `2` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
 
-Contoh URL:
-
-```text
-GET /api/sales?id_cabang=1&id_toko=2
-```
-
-Filter:
-
-| Field | Filter |
-| --- | --- |
-| `karyawan.deleted_at` | `IS NULL` |
-| `jabatan.deleted_at` | `IS NULL` |
-| `jabatan.nama_jabatan` | `LIKE '%sales%'` |
-| `karyawan.id_cabang` | `id_cabang` jika dikirim |
-| `karyawan.id_toko` | `id_toko` jika dikirim |
-
-Response payload:
+Response:
 
 ```json
 [
   {
-    "id_sales": 10,
+    "id_sales": "sales-1",
     "nama_sales": "Budi",
     "nama_jabatan": "Sales"
   }
 ]
 ```
 
-## GET /receivables
+## Stok
 
 URL:
 
 ```text
-GET /api/receivables
-GET /api/terima_piutang_list
+GET /api/stok
 ```
 
-Query:
+Query parameters:
 
-| Parameter | Wajib | Format | Contoh |
-| --- | --- | --- | --- |
-| `start_date` | Ya | `YYYY-MM-DD` | `2026-07-01` |
-| `end_date` | Ya | `YYYY-MM-DD` | `2026-07-31` |
-| `id_cabang` | Tidak | Angka | `1` |
-| `id_toko` | Tidak | Angka | `2` |
-| `id_sales` | Tidak | Angka | `10` |
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `id_toko` | Ya | `toko-1` |
 
-Contoh URL:
-
-```text
-GET /api/receivables?start_date=2026-07-01&end_date=2026-07-31&id_cabang=1&id_toko=2&id_sales=10
-```
-
-Filter:
-
-| Field | Filter |
-| --- | --- |
-| `terima_piutang.deleted_at` | `IS NULL` |
-| `pelanggan.deleted_at` | `IS NULL` |
-| `toko.deleted_at` | `IS NULL` |
-| `cabang.deleted_at` | `IS NULL` |
-| `sales.deleted_at` | `IS NULL` |
-| `terima_piutang.is_konfirmasi` | `= 1` |
-| `terima_piutang.created_at` | `>= start_date` |
-| `terima_piutang.created_at` | `<= end_date` |
-| `terima_piutang.id_cabang` | `id_cabang` jika dikirim |
-| `terima_piutang.id_toko` | `id_toko` jika dikirim |
-| `pelanggan.id_sales` | `id_sales` jika dikirim |
-
-Response payload:
+Response:
 
 ```json
 {
@@ -135,70 +87,535 @@ Response payload:
   "data": {
     "list": [
       {
-        "id_sales": 10,
-        "nama_sales": "Budi",
-        "jumlah_transaksi": 5,
-        "total_jumlah_bayar": "1500000",
-        "total_bayar_tunai": "500000",
-        "total_bayar_bank": "1000000"
-      }
-    ],
-    "sales": [
-      {
-        "id_sales": 10,
-        "nama_sales": "Budi",
-        "jumlah_transaksi": 5,
-        "total_jumlah_bayar": "1500000",
-        "total_bayar_tunai": "500000",
-        "total_bayar_bank": "1000000"
-      }
-    ],
-    "cabang": [
-      {
-        "id_cabang": 1,
-        "nama_cabang": "Cabang Utama",
-        "jumlah_transaksi": 5,
-        "total_jumlah_bayar": "1500000",
-        "total_bayar_tunai": "500000",
-        "total_bayar_bank": "1000000"
-      }
-    ],
-    "toko": [
-      {
-        "id_toko": 2,
-        "nama_toko": "Toko A",
-        "jumlah_transaksi": 5,
-        "total_jumlah_bayar": "1500000",
-        "total_bayar_tunai": "500000",
-        "total_bayar_bank": "1000000"
-      }
-    ],
-    "pelanggan": [
-      {
-        "id_pelanggan": 25,
-        "nama_pelanggan": "Pelanggan A",
-        "jumlah_transaksi": 2,
-        "total_jumlah_bayar": "700000",
-        "total_bayar_tunai": "200000",
-        "total_bayar_bank": "500000"
+        "kode_barang": "BRG001",
+        "kode_barcode": "8990001",
+        "nama_barang": "Barang A",
+        "nama_jenis_barang": "Jenis A",
+        "nama_kategori_barang": "Kategori A",
+        "nama_merk_barang": "Merk A",
+        "nama_vendor": "Vendor A",
+        "harga_beli": "10000",
+        "harga_jual_umum": "15000",
+        "harga_jual_barcode": "16000",
+        "harga_jual_ritel": "17000",
+        "qty": "20"
       }
     ]
   }
 }
 ```
 
-Payload jika `start_date` atau `end_date` kosong:
+## Pelanggan Periode
+
+URL:
+
+```text
+GET /api/pelanggan-periode
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `id_toko` | Ya | `toko-1` |
+| `start_date` | Ya | `2026-01-01` |
+| `end_date` | Ya | `2026-05-31` |
+
+Response:
 
 ```json
 {
   "success": true,
   "message": "Berhasil",
   "data": {
-    "list": [],
-    "sales": [],
-    "cabang": [],
-    "toko": [],
-    "pelanggan": []
+    "list": [
+      {
+        "nama_pelanggan": "Pelanggan A",
+        "nomor_hp": "08123456789",
+        "nomor_hp1": "08123456789",
+        "alamat_pelanggan": "Alamat A",
+        "alamat_pelanggan1": "Alamat Biodata A",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 10,
+        "total_belanja": "5000000",
+        "total_diskon": "100000",
+        "jumlah_transaksi_tahun_ini": 8,
+        "total_belanja_tahun_ini": "4000000",
+        "total_diskon_tahun_ini": "80000",
+        "jumlah_transaksi_periode": 5,
+        "total_belanja_periode": "2500000",
+        "total_diskon_periode": "50000",
+        "tanggal_terakhir_belanja": "2026-05-20",
+        "kode_penjualan_terakhir": "PJ-001",
+        "nama_kota": "Makassar",
+        "nama_provinsi": "Sulawesi Selatan",
+        "tanggal_nota_belum_lunas_terlama": "2026-01-10",
+        "lama_piutang_pelanggan": 30,
+        "umur_nota": 12,
+        "selisih_hari": 18,
+        "kode_nota_paling_lama_belum_lunas": "PJ-0001",
+        "total_belanja_belum_lunas": "1000000",
+        "total_sisa_hutang": "500000",
+        "limit_piutang_pelanggan": "2000000",
+        "selisih_limit": "1500000"
+      }
+    ]
+  }
+}
+```
+
+## Hutang Toko
+
+URL:
+
+```text
+GET /api/hutang-toko
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `id_toko` | Tidak | `toko-1` |
+| `id_tujuan_toko` | Tidak | `toko-2` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_terima_barang": "tb-1",
+        "nomor_pembelian": "TB-001",
+        "tanggal_pembelian": "18-07-26",
+        "pengirim": "Toko Pengirim",
+        "toko_penerima": "Toko Penerima",
+        "grand_total": "1000000",
+        "sisa_hutang": "500000",
+        "jenis_terima_barang": "Antar Cabang"
+      }
+    ],
+    "pengirim": [
+      {
+        "id_pengirim": "toko-2",
+        "pengirim": "Toko Pengirim",
+        "jenis_terima_barang": "Antar Cabang",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "2000000",
+        "total_sisa_hutang": "1000000"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko Penerima",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "2000000",
+        "total_sisa_hutang": "1000000"
+      }
+    ]
+  }
+}
+```
+
+## Terima Piutang
+
+URL:
+
+```text
+GET /api/receivables
+GET /api/terima_piutang_list
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `start_date` | Ya | `2026-07-01` |
+| `end_date` | Ya | `2026-07-31` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
+| `id_sales` | Tidak | `sales-1` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_terima_piutang": "tp-1",
+        "nomor_terima_piutang": "TP-001",
+        "tanggal_terima_piutang": "18-07-26",
+        "jumlah_bayar": "1000000",
+        "jumlah_bayar_tunai": "400000",
+        "jumlah_bayar_bank": "600000",
+        "catatan": "Catatan"
+      }
+    ],
+    "sales": [
+      {
+        "id_sales": "sales-1",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "cabang": [
+      {
+        "id_cabang": "cabang-1",
+        "nama_cabang": "Cabang A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "pelanggan": [
+      {
+        "id_pelanggan": "pelanggan-1",
+        "nama_pelanggan": "Pelanggan A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ]
+  }
+}
+```
+
+## Pendapatan
+
+URL:
+
+```text
+GET /api/pendapatan
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `start_date` | Ya | `2026-07-01` |
+| `end_date` | Ya | `2026-07-31` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
+| `id_sales` | Tidak | `sales-1` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_pelanggan_riwayat_bayar": "prb-1",
+        "tanggal_pelanggan_riwayat_bayar": "18-07-26",
+        "uang": "1000000",
+        "jumlah_bayar_tunai": "400000",
+        "jumlah_bayar_bank": "600000"
+      }
+    ],
+    "sales": [
+      {
+        "id_sales": "sales-1",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 3,
+        "total_uang": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "cabang": [
+      {
+        "id_cabang": "cabang-1",
+        "nama_cabang": "Cabang A",
+        "jumlah_transaksi": 3,
+        "total_uang": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko A",
+        "jumlah_transaksi": 3,
+        "total_uang": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "pelanggan": [
+      {
+        "id_pelanggan": "pelanggan-1",
+        "nama_pelanggan": "Pelanggan A",
+        "jumlah_transaksi": 3,
+        "total_uang": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ]
+  }
+}
+```
+
+## Penjualan
+
+URL:
+
+```text
+GET /api/penjualan
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `start_date` | Ya | `2026-07-01` |
+| `end_date` | Ya | `2026-07-31` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
+| `id_sales` | Tidak | `sales-1` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_penjualan": "pj-1",
+        "kode_penjualan": "PJ-001",
+        "tanggal_penjualan": "18-07-26",
+        "jumlah_bayar": "1000000",
+        "jumlah_bayar_tunai": "400000",
+        "jumlah_bayar_bank": "600000",
+        "catatan": "Catatan"
+      }
+    ],
+    "sales": [
+      {
+        "id_sales": "sales-1",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "cabang": [
+      {
+        "id_cabang": "cabang-1",
+        "nama_cabang": "Cabang A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ],
+    "pelanggan": [
+      {
+        "id_pelanggan": "pelanggan-1",
+        "nama_pelanggan": "Pelanggan A",
+        "jumlah_transaksi": 3,
+        "total_jumlah_bayar": "3000000",
+        "total_bayar_tunai": "1000000",
+        "total_bayar_bank": "2000000"
+      }
+    ]
+  }
+}
+```
+
+## Retur
+
+URL:
+
+```text
+GET /api/retur
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `start_date` | Ya | `2026-07-01` |
+| `end_date` | Ya | `2026-07-31` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
+| `id_sales` | Tidak | `sales-1` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_retur_penjualan": "rp-1",
+        "nomor_retur_penjualan": "RP-001",
+        "tanggal_retur_penjualan": "18-07-26",
+        "jumlah_retur": "500000",
+        "catatan": "Catatan"
+      }
+    ],
+    "sales": [
+      {
+        "id_sales": "sales-1",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 2,
+        "total_jumlah_retur": "1000000"
+      }
+    ],
+    "cabang": [
+      {
+        "id_cabang": "cabang-1",
+        "nama_cabang": "Cabang A",
+        "jumlah_transaksi": 2,
+        "total_jumlah_retur": "1000000"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko A",
+        "jumlah_transaksi": 2,
+        "total_jumlah_retur": "1000000"
+      }
+    ],
+    "pelanggan": [
+      {
+        "id_pelanggan": "pelanggan-1",
+        "nama_pelanggan": "Pelanggan A",
+        "jumlah_transaksi": 2,
+        "total_jumlah_retur": "1000000"
+      }
+    ]
+  }
+}
+```
+
+## Indent
+
+URL:
+
+```text
+GET /api/indent
+```
+
+Query parameters:
+
+| Parameter | Wajib | Contoh |
+| --- | --- | --- |
+| `start_date` | Ya | `2026-07-01` |
+| `end_date` | Ya | `2026-07-31` |
+| `id_cabang` | Tidak | `cabang-1` |
+| `id_toko` | Tidak | `toko-1` |
+| `id_sales` | Tidak | `sales-1` |
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil",
+  "data": {
+    "list": [
+      {
+        "id_pesanan_indent": "pi-1",
+        "nomor_pesanan_indent": "PI-001",
+        "tanggal_pesanan_indent": "18-07-26",
+        "grand_total": "2000000",
+        "jumlah_bayar": "1000000",
+        "jumlah_bayar_tunai": "400000",
+        "jumlah_bayar_bank": "600000",
+        "jumlah_cashback": "0",
+        "catatan": "Catatan"
+      }
+    ],
+    "sales": [
+      {
+        "id_sales": "sales-1",
+        "nama_sales": "Budi",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "4000000",
+        "total_jumlah_bayar": "2000000",
+        "total_bayar_tunai": "800000",
+        "total_bayar_bank": "1200000",
+        "total_cashback": "0"
+      }
+    ],
+    "cabang": [
+      {
+        "id_cabang": "cabang-1",
+        "nama_cabang": "Cabang A",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "4000000",
+        "total_jumlah_bayar": "2000000",
+        "total_bayar_tunai": "800000",
+        "total_bayar_bank": "1200000",
+        "total_cashback": "0"
+      }
+    ],
+    "toko": [
+      {
+        "id_toko": "toko-1",
+        "nama_toko": "Toko A",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "4000000",
+        "total_jumlah_bayar": "2000000",
+        "total_bayar_tunai": "800000",
+        "total_bayar_bank": "1200000",
+        "total_cashback": "0"
+      }
+    ],
+    "pelanggan": [
+      {
+        "id_pelanggan": "pelanggan-1",
+        "nama_pelanggan": "Pelanggan A",
+        "jumlah_transaksi": 2,
+        "total_grand_total": "4000000",
+        "total_jumlah_bayar": "2000000",
+        "total_bayar_tunai": "800000",
+        "total_bayar_bank": "1200000",
+        "total_cashback": "0"
+      }
+    ]
   }
 }
 ```

@@ -12,6 +12,10 @@ Route::get('/branches', [CrmController::class, 'cabang']);
 
 Route::get('/sales', [CrmController::class, 'sales']);
 Route::get('/salespeople', [CrmController::class, 'sales']);
+Route::get('/stok', [CrmController::class, 'stok']);
+Route::get('/pelanggan-periode', [CrmController::class, 'pelanggan_periode']);
+Route::get('/hutang-toko', [CrmController::class, 'hutang_toko']);
+Route::get('/piutang-pelanggan', [CrmController::class, 'piutang_pelanggan']);
 
 
 Route::get('/receivables', [CrmController::class, 'terima_piutang']);
