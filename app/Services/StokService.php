@@ -12,25 +12,14 @@ class StokService
 
     public function stok(): array
     {
-        $idToko = request()->get('id_toko', '');
+        $toko = $this->resolveToko();
 
-        if ($idToko === '') {
+        if ($toko === null) {
             return [];
         }
 
-        $cabang = DB::table('cabang')
-            ->join('toko', 'toko.id_cabang', '=', 'cabang.id')
-            ->where('toko.id', $idToko)
-            ->whereNull('cabang.deleted_at')
-            ->whereNull('toko.deleted_at')
-            ->select('cabang.id as id_cabang')
-            ->first();
-
-        if ($cabang === null) {
-            return [];
-        }
-
-        $idCabang = $cabang->id_cabang;
+        $idCabang = $toko->id_cabang;
+        $idToko = $toko->id_toko;
 
         return DB::table('barang as b')
             ->leftJoin('barang_varian as bv', 'bv.id_barang', '=', 'b.id')
@@ -131,5 +120,105 @@ class StokService
             ->get()
             ->map(fn ($stok) => (array) $stok)
             ->all();
+    }
+
+    public function summary(): array
+    {
+        $toko = $this->resolveToko();
+
+        if ($toko === null) {
+            return [];
+        }
+
+        $summary = DB::table('stok_barang as sb')
+            ->whereNull('sb.deleted_at')
+            ->where('sb.id_cabang', $toko->id_cabang)
+            ->where('sb.id_toko', $toko->id_toko)
+            ->select(
+                DB::raw('COUNT(DISTINCT sb.id_barang) as jumlah_barang'),
+                DB::raw('COUNT(DISTINCT COALESCE(sb.id_barang_varian, sb.id_barang)) as jumlah_sku'),
+                DB::raw('COALESCE(SUM(sb.qty), 0) as total_qty'),
+                DB::raw('COALESCE(SUM(sb.qty * sb.harga_beli), 0) as total_nilai_stok')
+            )
+            ->first();
+
+        return $summary === null ? [] : (array) $summary;
+    }
+
+    public function movements(): array
+    {
+        $toko = $this->resolveToko();
+
+        if ($toko === null) {
+            return [];
+        }
+
+        $query = DB::table('stok_barang as sb')
+            ->join('barang as b', 'b.id', '=', 'sb.id_barang')
+            ->leftJoin('barang_varian as bv', 'bv.id', '=', 'sb.id_barang_varian')
+            ->whereNull('sb.deleted_at')
+            ->whereNull('b.deleted_at')
+            ->where('sb.id_cabang', $toko->id_cabang)
+            ->where('sb.id_toko', $toko->id_toko);
+
+        $startDate = request()->get('start_date', '');
+        $endDate = request()->get('end_date', '');
+        $idBarang = request()->get('id_barang', '');
+
+        if ($startDate !== '') {
+            $query->whereRaw('DATE(COALESCE(sb.date_created_at, sb.created_at)) >= ?', [$startDate]);
+        }
+
+        if ($endDate !== '') {
+            $query->whereRaw('DATE(COALESCE(sb.date_created_at, sb.created_at)) <= ?', [$endDate]);
+        }
+
+        if ($idBarang !== '') {
+            $query->where('sb.id_barang', $idBarang);
+        }
+
+        return $query
+            ->select(
+                'sb.id as id_stok_barang',
+                DB::raw("DATE_FORMAT(COALESCE(sb.date_created_at, sb.created_at), '%d-%m-%y') as tanggal"),
+                'b.id as id_barang',
+                'bv.id as id_barang_varian',
+                'b.kode_barang',
+                DB::raw("CASE WHEN b.varian_barang = 'iya' THEN bv.barcode ELSE b.kode_barang END as kode_barcode"),
+                'b.nama_barang',
+                'sb.qty',
+                'sb.sisa_qty',
+                'sb.harga_beli',
+                'sb.harga_jual',
+                'sb.transaksi_id',
+                'sb.transaksi_model',
+                'sb.transaksi_parent_id',
+                'sb.transaksi_parent_model'
+            )
+            ->orderByRaw('COALESCE(sb.date_created_at, sb.created_at) DESC')
+            ->orderByDesc('sb.id')
+            ->get()
+            ->map(fn ($movement) => (array) $movement)
+            ->all();
+    }
+
+    private function resolveToko()
+    {
+        $idToko = request()->get('id_toko', '');
+
+        if ($idToko === '') {
+            return null;
+        }
+
+        return DB::table('cabang')
+            ->join('toko', 'toko.id_cabang', '=', 'cabang.id')
+            ->where('toko.id', $idToko)
+            ->whereNull('cabang.deleted_at')
+            ->whereNull('toko.deleted_at')
+            ->select(
+                'cabang.id as id_cabang',
+                'toko.id as id_toko'
+            )
+            ->first();
     }
 }

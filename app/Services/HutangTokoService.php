@@ -6,6 +6,20 @@ use Illuminate\Support\Facades\DB;
 
 class HutangTokoService
 {
+    public function summary(): array
+    {
+        $summary = $this->baseQuery()
+            ->select(
+                DB::raw('COUNT(tb.id) as jumlah_nota'),
+                DB::raw('COALESCE(SUM(tb.grand_total), 0) as total_grand_total'),
+                DB::raw('COALESCE(SUM(cup_total.sisa_hutang), 0) as total_sisa_hutang'),
+                DB::raw('MAX(DATEDIFF(CURRENT_DATE, DATE(tb.tanggal))) as umur_tertua')
+            )
+            ->first();
+
+        return $summary === null ? [] : (array) $summary;
+    }
+
     public function hutang_toko(): array
     {
         $query = $this->baseQuery();
@@ -69,6 +83,32 @@ class HutangTokoService
             ->orderBy('p.nama_toko')
             ->get()
             ->map(fn ($toko) => (array) $toko)
+            ->all();
+    }
+
+    public function aging(): array
+    {
+        $umurExpression = 'DATEDIFF(CURRENT_DATE, DATE(tb.tanggal))';
+        $bucketExpression = "CASE
+            WHEN {$umurExpression} <= 30 THEN '0-30'
+            WHEN {$umurExpression} <= 60 THEN '31-60'
+            WHEN {$umurExpression} <= 90 THEN '61-90'
+            ELSE '>90'
+        END";
+
+        return $this->baseQuery()
+            ->select(
+                DB::raw("{$bucketExpression} as umur"),
+                DB::raw('COUNT(tb.id) as jumlah_nota'),
+                DB::raw('COALESCE(SUM(tb.grand_total), 0) as total_grand_total'),
+                DB::raw('COALESCE(SUM(cup_total.sisa_hutang), 0) as total_sisa_hutang'),
+                DB::raw("MIN({$umurExpression}) as min_umur"),
+                DB::raw("MAX({$umurExpression}) as max_umur")
+            )
+            ->groupBy(DB::raw($bucketExpression))
+            ->orderByRaw("MIN({$umurExpression})")
+            ->get()
+            ->map(fn ($aging) => (array) $aging)
             ->all();
     }
 
