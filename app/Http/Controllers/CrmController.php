@@ -59,6 +59,43 @@ class CrmController extends Controller
         ]);
     }
 
+    public function penjualan()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->laporanPenjualanService->penjualan(),
+            'sales' => $this->laporanPenjualanService->groupBySales(),
+            'cabang' => $this->laporanPenjualanService->groupByCabang(),
+            'toko' => $this->laporanPenjualanService->groupByToko(),
+            'pelanggan' => $this->laporanPenjualanService->groupByPelanggan()
+        ]);
+    }
+
+    public function retur()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->returService->retur(),
+            'sales' => $this->returService->groupBySales(),
+            'cabang' => $this->returService->groupByCabang(),
+            'toko' => $this->returService->groupByToko(),
+            'pelanggan' => $this->returService->groupByPelanggan()
+        ]);
+    }
+
+     public function indent()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->indentService->indent(),
+            'sales' => $this->indentService->groupBySales(),
+            'cabang' => $this->indentService->groupByCabang(),
+            'toko' => $this->indentService->groupByToko(),
+            'pelanggan' => $this->indentService->groupByPelanggan()
+        ]);
+    }
+
+
+
+
+
 
 
 

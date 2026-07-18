@@ -20,3 +20,6 @@ Route::get('/terima_piutang_list', [CrmController::class, 'terima_piutang']);
 
 
 Route::get('/pendapatan', [CrmController::class, 'pendapatan']);
+Route::get('/penjualan', [CrmController::class, 'penjualan']);
+Route::get('/retur', [CrmController::class, 'retur']);
+Route::get('/indent', [CrmController::class, 'indent']);
