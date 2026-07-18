@@ -16,3 +16,7 @@ Route::get('/salespeople', [CrmController::class, 'sales']);
 
 Route::get('/receivables', [CrmController::class, 'terima_piutang']);
 Route::get('/terima_piutang_list', [CrmController::class, 'terima_piutang']);
+
+
+
+Route::get('/pendapatan', [CrmController::class, 'pendapatan']);

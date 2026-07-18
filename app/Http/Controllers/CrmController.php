@@ -40,13 +40,26 @@ class CrmController extends Controller
     public function terima_piutang()
     {
         return $this->sendSuccessResponse([
-            'list' => $this->terimaPiutangService->groupBySales(),
+            'list' => $this->terimaPiutangService->terima_piutang(),
             'sales' => $this->terimaPiutangService->groupBySales(),
             'cabang' => $this->terimaPiutangService->groupByCabang(),
             'toko' => $this->terimaPiutangService->groupByToko(),
              'pelanggan' => $this->terimaPiutangService->groupByPelanggan()
         ]);
     }
+
+    public function pendapatan()
+    {
+        return $this->sendSuccessResponse([
+            'list' => $this->laporanPendapatanService->pendapatan(),
+            'sales' => $this->laporanPendapatanService->groupBySales(),
+            'cabang' => $this->laporanPendapatanService->groupByCabang(),
+            'toko' => $this->laporanPendapatanService->groupByToko(),
+            'pelanggan' => $this->laporanPendapatanService->groupByPelanggan()
+        ]);
+    }
+
+
 
 
     function sendSuccessResponse($data)
